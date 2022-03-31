@@ -1,0 +1,49 @@
+<?php //die($selComponent);?>
+<h1 class="text-center text-warning">Grant Access to controllers</h1>
+<div class="w-50 m-auto">
+<?php echo $this->tag->form('');?>
+<label for="role" class="form-label">Select Role</label>
+<select class="form-select" name="role" aria-label="Default select example">
+  <option value="" selected></option>
+    <?php
+        foreach ($roles as $role) {
+            if ($selrole==$role->role) {
+                echo '<option value="'.$role->name.'" selected>'.$role->name.'</option>';
+            } else {
+                echo '<option value="'.$role->name.'">'.$role->name.'</option>';
+            }
+        }
+    ?>
+</select>
+
+<label for="components" class="form-label">Select component</label>
+<select class="form-select" name="components" onchange="form.submit()" aria-label="Default select example">
+  <option value="" selected></option>
+    <?php
+        foreach ($controllers as $value) {
+            if ($value==$selComponent) {
+                echo '<option value="'.$value.'" selected>'.$value.'</option>';
+            } else {
+                echo '<option value="'.$value.'">'.$value.'</option>';
+            }
+            
+        }
+    ?>
+</select>
+<label for="actions" class="form-label">Select Action</label>
+<select class="form-select" name="actions" aria-label="Default select example">
+  <option value="" selected></option>
+    <?php
+        foreach ($actions[$selComponent] as $value) {
+            
+            echo '<option value="'.$value.'">'.$value.'</option>';
+        }
+    ?>
+</select>
+
+<?php
+echo $this->tag->submitButton(["Grant Access!", 'class'=>"btn btn-primary mt-3"]);
+?>
+</form>
+</div>
+<div class="alert alert-danger w-50 m-auto mt-2"><?php if (isset($message)) echo $message; ?></div>

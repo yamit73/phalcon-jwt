@@ -1,0 +1,33 @@
+<h1 class="text-center text-warning">Add Order</h1>
+<div class="w-50 m-auto">
+<?php
+
+echo $this->tag->form('');
+echo '<label for="customer_name" class="form-label">Customer Name</label>';
+echo $this->tag->textField(["customer_name", 'class'=>"form-control"]);
+
+echo '<label for="address" class="form-label">Customer Address</label>';
+echo $this->tag->textArea(["address", 'class'=>"form-control"]);
+
+echo '<label for="zipcode" class="form-label">Zipcode</label>';
+echo $this->tag->textField(["zipcode", 'class'=>"form-control"]);
+?>
+<label for="product_id" class="form-label">Select Product</label>
+<select class="form-select" name="product_id" aria-label="Default select example">
+  <option value="" selected></option>
+    <?php
+        foreach ($products as $product) {
+            echo '<option value="'.$product->id.'">'.$product->name.'</option>';
+        }
+    ?>
+  
+</select>
+<?php
+echo '<label for="quantity" class="form-label">Product Quantity</label>';
+echo $this->tag->textField(["quantity", 'class'=>"form-control"]);
+
+echo $this->tag->submitButton(["Place Order", 'class'=>"btn btn-primary mt-3"]);
+?>
+</form>
+</div>
+<div class="alert alert-danger w-50 m-auto mt-2"><?php if (isset($message)) echo $message; ?></div>

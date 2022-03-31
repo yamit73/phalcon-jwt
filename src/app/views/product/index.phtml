@@ -1,0 +1,29 @@
+<div class="container">
+    <table class="table table-hover">
+        <thead class="text-light bg-dark">
+        <tr>
+            <th scope="col">id</th>
+            <th scope="col">Name</th>
+            <th scope="col">Description</th>
+            <th scope="col">Tags</th>
+            <th scope="col">Price</th>
+            <th scope="col">Stocks</th>
+        </tr>
+        </thead>
+        <tbody>
+            <?php
+            foreach ($products as $product) {
+                echo '<tr>
+                        <th scope="row">'.$product->id.'</th>
+                        <td>'.$product->name.'</td>
+                        <td>'.$product->description.'</td>
+                        <td>'.$product->tags.'</td>
+                        <td>'.$product->price.'</td>
+                        <td>'.$product->stock.'</td>
+                    </tr>';
+            }
+            ?>
+        </tbody>
+
+    </table>
+</div>
