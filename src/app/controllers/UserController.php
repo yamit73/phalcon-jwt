@@ -1,7 +1,6 @@
 <?php
 
 use Phalcon\Mvc\Controller;
-
 class UserController extends Controller
 {
     public function indexAction()
@@ -23,15 +22,18 @@ class UserController extends Controller
             $postData = $this->request->getPost();
             $escaper=new \App\Components\MyEscaper();
             $data=$escaper->sanitize($postData);
+            /**
+             * add user to database
+             */
             $user->assign($data, ['name', 'email', 'role']);
-            $role=Roles::findFirst($data['role'])->name;
+            $userData['name']=$data['name'];
+            $userData['role']=Roles::findFirst($data['role'])->name;
             if ($user->save()) {
                 $this->view->message = "Registered!";
                 //creating an object of event manager
                 $eventsManagers=$this->di->get('EventsManager');
                 //firing event to create a token
-                $this->view->token=$eventsManagers->fire('notification:createToken', $this, $role);
-                // die($data);
+                $this->view->token=$eventsManagers->fire('notification:createToken', $this, $userData);
             } else {
                 $this->view->message = "Not registered: <br>" . implode("<br>", $user->getMessages());
             }

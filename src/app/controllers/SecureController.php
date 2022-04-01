@@ -27,11 +27,13 @@ class SecureController extends Controller
                 $acl->addRole($value->name);
             }
             //add components to acl file
+            $acl->addComponent('index', 'index');
             foreach ($components as $val) {
                 $acl->addComponent($val->name, explode(',', $val->actions));
             }
             //allow access to roles
             $acl->allow('admin', '*', '*');
+            $acl->allow('*', 'index', 'index');
             foreach ($permissions as $val) {
                 $acl->allow($val->role, $val->components, $val->actions);
             }

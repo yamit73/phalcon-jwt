@@ -8,11 +8,10 @@ use Phalcon\Di\Injectable;
 use Phalcon\Events\Event;
 use ProductController;
 use Settings;
-
-use Phalcon\Security\JWT\Builder;
-use Phalcon\Security\JWT\Signer\Hmac;
 use Phalcon\Security\JWT\Token\Parser;
 use Phalcon\Security\JWT\Validator;
+use Firebase\JWT\JWT;
+use Firebase\JWT\Key;
 
 class NotificationListener extends Injectable
 {
@@ -64,19 +63,38 @@ class NotificationListener extends Injectable
         $bearer=$this->request->getQuery('bearer');
         if ($bearer) {
             try {
-                $parser=new Parser();
-                $tokenObject=$parser->parse($bearer);
-                $now=new DateTimeImmutable();
-                $expires=$now->getTimestamp();
-                $validator=new Validator($tokenObject, 100);
-                $validator->ValidateExpiration($expires);
-                // die;
-                $claims=$tokenObject->getClaims()->getPayload();
-                $role=$claims['sub'];
+                $key = "example_key";
+                $now = new DateTimeImmutable();
+                /**
+                 * parsing token bearer
+                 */
+                $parser = new Parser();
+                $tokenObject = $parser->parse($bearer);
 
+                /**
+                 * validating token
+                 */
+                $validator = new Validator($tokenObject, 100);
+                $validator->validateExpiration($now->getTimestamp())
+                          ->validateNotBefore($now->modify('-1 minute')->getTimestamp());
+
+                /**
+                 * decoding token using the same key that is used to encode
+                 */
+                $decodedToken = JWT::decode($bearer, new Key($key, 'HS256'));
+                /**
+                 * take role from token
+                 * controller and action from url
+                 */
+                $role=$decodedToken->sub;
                 $controller=$this->router->getControllerName() ?? 'index';
                 $action=$this->router->getActionName() ?? 'index';
                 $aclFile=APP_PATH.'/security/acl.cache';
+                /**
+                 * check if acl file exixt or not
+                 * if exist unserialize its data and use it
+                 * else build it
+                 */
                 if (is_file($aclFile)==true) {
                     $acl=unserialize(
                         file_get_contents($aclFile)
@@ -88,7 +106,7 @@ class NotificationListener extends Injectable
                     $this->response->redirect('secure/buildACL');
                 }
             } catch (Exception $e) {
-                echo $e->getMessage();
+                echo '<h1 style="color:red;">'.$e->getMessage().'</h1>';
                 die;
             }
         } else {
@@ -100,36 +118,19 @@ class NotificationListener extends Injectable
      *
      * @return void
      */
-    public function createToken(Event $event, $user, $role)
+    public function createToken(Event $event, $user, $data)
     {
-        $signer  = new Hmac();
-
-        // Builder object
-        $builder = new Builder($signer);
-
-        $now        = new DateTimeImmutable();
-        $issued     = $now->getTimestamp();
-        $notBefore  = $now->modify('-1 minute')->getTimestamp();
-        $expires    = $now->modify('+1 day')->getTimestamp();
-        $passphrase = 'QcMpZ&b&mo3TPsPk668J6QH8JA$&U&m2';
-
-        // Setup
-        $builder
-            ->setAudience('https://target.phalcon.io')  // aud
-            ->setContentType('application/json')        // cty - header
-            ->setExpirationTime($expires)               // exp 
-            ->setId('abcd123456789')                    // JTI id 
-            ->setIssuedAt($issued)                      // iat 
-            ->setIssuer('https://phalcon.io')           // iss 
-            ->setNotBefore($notBefore)                  // nbf
-            ->setSubject($role)   // sub
-            ->setPassphrase($passphrase)                // password 
-        ;
-
-        // Phalcon\Security\JWT\Token\Token object
-        $tokenObject = $builder->getToken();
-
-        // The token
-        return $tokenObject->getToken();
+        $key = "example_key";
+        $now = new DateTimeImmutable();
+        $payload = array(
+            "iss" => "http://example.org",
+            "aud" => "http://example.com",
+            "iat" => $now->getTimestamp(),
+            "nbf" => $now->modify('-1 minute')->getTimestamp(),
+            "exp" => $now->modify('+1 day')->getTimestamp(),
+            'sub' => $data['role'],
+            'nam' => $data['name']
+        );
+        return JWT::encode($payload, $key, 'HS256');
     }
 }
