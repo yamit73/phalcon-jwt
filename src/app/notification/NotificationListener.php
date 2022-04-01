@@ -86,7 +86,7 @@ class NotificationListener extends Injectable
                  * take role from token
                  * controller and action from url
                  */
-                $role=$decodedToken->sub;
+                $role=$decodedToken->sub ?? 'admin';
                 $controller=$this->router->getControllerName() ?? 'index';
                 $action=$this->router->getActionName() ?? 'index';
                 $aclFile=APP_PATH.'/security/acl.cache';
@@ -100,7 +100,7 @@ class NotificationListener extends Injectable
                         file_get_contents($aclFile)
                     );
                     if ($acl->isAllowed($role, $controller, $action)!==true) {
-                        die('<h1 style="color:red;">Access denied!</h1>');
+                        die('<h1 style="color:red;">'.$this->locale->_('access').'</h1>');
                     }
                 } else {
                     $this->response->redirect('secure/buildACL');
@@ -110,7 +110,7 @@ class NotificationListener extends Injectable
                 die;
             }
         } else {
-            die('<h1 style="color:red;">Bearer not found!!!!!</h1>');
+            die('<h1 style="color:red;">'.$this->locale->_('token').'</h1>');
         }
     }
     /**

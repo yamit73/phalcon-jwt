@@ -1,4 +1,4 @@
-<h1 class="text-center text-warning">Add Order</h1>
+<h1 class="text-center text-warning"><?php echo $this->locale->_('order_title');?></h1>
 <div class="w-50 m-auto">
 <?php
 
@@ -26,7 +26,7 @@ echo $this->tag->textField(["zipcode", 'class'=>"form-control"]);
 echo '<label for="quantity" class="form-label">Product Quantity</label>';
 echo $this->tag->textField(["quantity", 'class'=>"form-control"]);
 
-echo $this->tag->submitButton(["Place Order", 'class'=>"btn btn-primary mt-3"]);
+echo $this->tag->submitButton([$this->locale->_('order_title'), 'class'=>"btn btn-primary mt-3"]);
 ?>
 </form>
 </div>

@@ -83,7 +83,13 @@
             ]
         );
         ?>
-        </div>
+        <form>
+            <select class="form-select bg-primary d-inline" name='lan' onchange="form.submit()" style="width:125px;height:35px">
+                <option value="en" selected>English</option>
+                <option value="rus">Russian</option>
+                <option value="dch">Duch</option>
+            </select>
+        </form>
         <hr>
         <?php echo $this->getContent(); ?>
     </div>

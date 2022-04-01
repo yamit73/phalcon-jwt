@@ -52,6 +52,11 @@ $container->set(
     }
 );
 
+$container->set(
+    'locale',
+    (new \App\Components\Locale())->getTranslator()
+);
+
 $application = new Application($container);
 
 $container->set(
